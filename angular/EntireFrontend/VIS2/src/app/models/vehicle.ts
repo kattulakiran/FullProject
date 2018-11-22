@@ -3,7 +3,7 @@
 export class Vehicle {
    
 
-    policy_id: String ;
+    policy_id: string ;
     vehicle_owner:String;
     vehicle_state:String;
     vehicle_type:String;

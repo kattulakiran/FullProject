@@ -22,17 +22,5 @@ export class CancelMainpageComponent implements OnInit {
   }
 
 
-  paypremium(){
-    this.route.navigate(['usermain']);
-  }
-  
-  
-  claimpolicy(){
-    this.route.navigate(['claimpolicy']);
-  }
-  
-  cancelpolicy(){
-    this.route.navigate(['cancelpolicy']);
-  }
-
+ 
 }

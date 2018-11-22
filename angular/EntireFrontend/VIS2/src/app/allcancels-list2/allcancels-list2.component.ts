@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Cancel } from '../models/cancel';
 import { VehicleService } from '../vehicle.service';
+import { Vehicle } from '../models/vehicle';
 
 @Component({
   selector: 'app-allcancels-list2',
@@ -11,7 +12,8 @@ export class AllcancelsList2Component implements OnInit {
 cancel:Cancel=new Cancel();
 cancels:Cancel[];
 policy_id:string;
-
+vehicle:Vehicle=new Vehicle();
+vehicles:Vehicle[];
 result:string=null;
   constructor(private vs:VehicleService) { }
 
@@ -19,7 +21,7 @@ result:string=null;
 
     this.vs.cancelreqpolicy()
     .subscribe( data => {         
-      this.cancels = data;
+      this.vehicles = data;
       
     });
 
@@ -27,7 +29,7 @@ result:string=null;
 
   cancelpolicies(result,i){
     this.result=result;
-    this.vs.cancelpolicyStatus(this.cancels[i].policy_id).subscribe(res=>{});
+    this.vs.cancelpolicyStatus(this.vehicles[i].policy_id).subscribe(res=>{});
    
   }
 

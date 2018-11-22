@@ -34,6 +34,10 @@ import { AllclaimsList2Component } from './allclaims-list2/allclaims-list2.compo
 import { AllcancelsList2Component } from './allcancels-list2/allcancels-list2.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import {FormBuilder} from '@angular/forms';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ContactusComponent } from './contactus/contactus.component';
+import { AboutusComponent } from './aboutus/aboutus.component';
+import { FooterComponent } from './footer/footer.component';
 
 
 @NgModule({
@@ -66,6 +70,10 @@ import {FormBuilder} from '@angular/forms';
     AllcancelsListComponent,
     AllclaimsList2Component,
     AllcancelsList2Component,
+    DashboardComponent,
+    ContactusComponent,
+    AboutusComponent,
+    FooterComponent,
     
   ],
   imports: [

@@ -13,17 +13,6 @@ export class ClaimsMainpageComponent implements OnInit {
   ngOnInit() {
   }
  
-  vehiclereg(){
-    this.route.navigate(['vehiclereg']);
-  }
-
-  claims(){
-    this.route.navigate(['claims']);
-  }
-
-  cancelpolicies(){
-    this.route.navigate(['cancelpolicies']);
-  }
 
 
 

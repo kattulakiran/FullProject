@@ -15,24 +15,37 @@
   <tr>
     <th>Customer Id</th>
     <th>Policy Id</th>
-    <th>Cancellation Id</th>
-    <th>Total Amount</th>
-    <th>Registered Date</th>
-    <th>Last Paid Date</th>
-    <th>Cancelled Date</th>
-    <th>Withdraw Amount</th>
+    <th>Vehicle Owner</th>
+    <th>Vehicle Registration State</th>
+    <th>Vehicle Type</th>
+    <th>Vehicle Class</th>
+    <th>Manufacturer</th>
+    <th>Model</th>
+    <th>Engine Number</th>
+    <th>Make Year</th>
+    <th>Regiistering Location</th>
+    <th>Date Of Purchase</th>
+    <th>Price</th>
+    <th>Premium Amount</th>
     <th>Status</th>
+    
   </tr>
 
-  <tr *ngFor="let cancel of cancels; let i=index;">
-    <td>{{cancel.customer_id}}</td>
-    <td>{{cancel.policy_id}}</td>
-    <td>{{cancel.cancel_id}}</td>
-    <td>{{cancel.total_amount}}</td>
-    <td>{{cancel.registered_date}}</td>
-    <td>{{cancel.last_paid_date}}</td>
-    <td>{{cancel.cancel_date}}</td>  
-    <td>{{cancel.withdraw_amount}}</td> 
+  <tr *ngFor="let vehicle of vehicles; let i=index;">
+    <td>{{vehicle.customer_id}}</td>
+    <td>{{vehicle.policy_id}}</td>
+    <td>{{vehicle.vehicle_owner}}</td>
+    <td>{{vehicle.vehicle_state}}</td>
+    <td>{{vehicle.vehicle_type}}</td>
+    <td>{{vehicle.vehicle_class}}</td>
+    <td>{{vehicle.manufacturer}}</td>
+    <td>{{vehicle.model}}</td>
+    <td>{{vehicle.engine_number}}</td>
+    <td>{{vehicle.make_year}}</td>
+    <td>{{vehicle.registering_location}}</td>
+    <td>{{vehicle.date_of_purchase}}</td>
+    <td>{{vehicle.price}}</td>
+    <td>{{vehicle.premium_amount}}</td>
     <td *ngIf='!result && cancel.status!="approved"'><button class="btn btn-danger" (click)="cancelpolicies('delete', i)"  >Delete</button></td> 
     <td *ngIf="cancel.status=='approved'">Approved</td>
     <td *ngIf='result'><b> {{result=='delete'?'Deleted':'Rejected'}} </b></td>

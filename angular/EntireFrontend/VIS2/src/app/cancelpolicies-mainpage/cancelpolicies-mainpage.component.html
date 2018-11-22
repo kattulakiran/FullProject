@@ -6,9 +6,9 @@
   <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
     <div class="navbar-nav">
      
-      <a class="nav-item nav-link" (click)="vehiclereg()" >Vehicle Registration</a>
-      <a class="nav-item nav-link" (click)="claims()" >Claims</a>
-      <a class="nav-item nav-link active" (click)="cancelpolicies()" >Cancel Policy</a>
+      <a class="nav-item nav-link" [routerLink]="['/vehiclereg']" >Vehicle Registration</a>
+      <a class="nav-item nav-link" [routerLink]="['/claims']" >Claims</a>
+      <a class="nav-item nav-link active" [routerLink]="['/cancelpolicies']" >Cancel Policy</a>
       <a class="nav-item nav-link" [routerLink]="['']">Logout</a>
      
     </div>
@@ -32,3 +32,4 @@
       </div>
   </div>
 </div> 
+

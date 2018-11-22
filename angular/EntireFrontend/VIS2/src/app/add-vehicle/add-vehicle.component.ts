@@ -21,7 +21,7 @@ ngOnInit(){
     vehicle_class:[''],
     manufacturer:[''],
     model:[''],
-    engine_number:['String'],
+    engine_number:[''],
     make_year:[''],
     registering_location:[''],
     date_of_purchase:[''],

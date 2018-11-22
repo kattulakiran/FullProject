@@ -28,6 +28,8 @@ import { AllclaimsListComponent } from './allclaims-list/allclaims-list.componen
 import { AllclaimsList2Component } from './allclaims-list2/allclaims-list2.component';
 import { AllcancelsListComponent } from './allcancels-list/allcancels-list.component';
 import { AllcancelsList2Component } from './allcancels-list2/allcancels-list2.component';
+import { ContactusComponent } from './contactus/contactus.component';
+import { AboutusComponent } from './aboutus/aboutus.component';
 
 
 const routes: Routes = [
@@ -35,6 +37,8 @@ const routes: Routes = [
   {path:'',component:HomePageComponent},
   {path:'admin',component:AdminLoginComponent},
   {path:'user',component:UserLoginComponent},
+  {path:'aboutus',component:AboutusComponent},
+  {path:'contactus',component:ContactusComponent},
   {path:'vehiclereg',component:VehicleRegComponent},
   {path:'addpolicy',component:AddVehicleComponent},
   {path:'listallpolicies',component:VehicleListComponent},

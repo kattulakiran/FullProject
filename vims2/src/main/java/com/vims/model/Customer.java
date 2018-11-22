@@ -8,8 +8,6 @@ import javax.persistence.Id;
 
 import org.hibernate.annotations.GenericGenerator;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 @Entity(name="customer_registration")
 @GenericGenerator(name="custid",strategy="com.vims.generators.CustIdGenerator")
 public class Customer {
@@ -27,7 +25,6 @@ public class Customer {
 	private String email_id;
 	private String gender;
 	private String contact_number;
-	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date date_of_birth;
 	
 	

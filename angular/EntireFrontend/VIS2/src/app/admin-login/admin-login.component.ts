@@ -9,7 +9,7 @@ import { AdminLogin } from '../models/AdminLogin';
   styleUrls: ['./admin-login.component.css']
 })
 export class AdminLoginComponent{
-
+message:string;
   adlogin:AdminLogin=new AdminLogin();
 
   
@@ -23,7 +23,7 @@ export class AdminLoginComponent{
           
           this.router.navigateByUrl('vehiclereg');}
           else{
-            alert("Invalid Credentials");
+            this.message="Invalid Credentials";
           }
         },
       );

@@ -9,7 +9,7 @@ import { VehicleService } from '../vehicle.service';
   styleUrls: ['./user-login.component.css']
 })
 export class UserLoginComponent implements OnInit {
-
+message:string;
   customer:Customer=new Customer();
   
   constructor(private route:Router,private vs:VehicleService) { }
@@ -28,7 +28,7 @@ login(){
           this.route.navigate(['usermain']);}
           else{
             if(data=='Customer not found'){
-              alert(data);
+              this.message="Invalid Credentials";
             }
 
          

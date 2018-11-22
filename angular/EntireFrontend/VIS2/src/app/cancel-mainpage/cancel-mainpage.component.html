@@ -8,9 +8,9 @@
   <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
     <div class="navbar-nav">
   
-      <a class="nav-item nav-link" (click)="paypremium()" >Pay Premium</a>
-      <a class="nav-item nav-link" (click)="claimpolicy()">Claim Policy</a>
-      <a class="nav-item nav-link active" (click)="cancelpolicy()">Cancel Policy</a>
+      <a class="nav-item nav-link" [routerLink]="['/usermain']" >Pay Premium</a>
+      <a class="nav-item nav-link" [routerLink]="['/claimpolicy']" >Claim Policy</a>
+      <a class="nav-item nav-link active" [routerLink]="['/cancelpolicy']">Cancel Policy</a>
       <a class="nav-item nav-link" [routerLink]="['']">Logout</a>
      
     </div>
