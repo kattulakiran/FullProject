@@ -14,6 +14,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity(name="vehicle_details")
 @GenericGenerator(name="policyid",strategy="com.vims.generators.PolicyIdGenerator")
 public class VehicleRegistration {
@@ -31,9 +33,11 @@ public class VehicleRegistration {
 	private String engine_number;
 	private String make_year;
 	private String registering_location;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date date_of_purchase;
 	private String price;
 	private String premium_amount;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date maturity_date;
 	
 	public String getCustomer_id() {

@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity(name="direct_pay")
 @GenericGenerator(name="paymentid",strategy="com.vims.generators.PaymentIdGenerator")
 public class DirectPay {
@@ -20,7 +22,9 @@ public class DirectPay {
 	@GeneratedValue(generator="paymentid")
 	private String payment_id;
 	private String premium_amount;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date due_date;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date payment_date;
 	private String pay_mode;
 	private double amount_paid;

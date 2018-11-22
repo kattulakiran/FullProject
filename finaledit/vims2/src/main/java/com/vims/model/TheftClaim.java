@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity(name="theft_claim")
 @GenericGenerator(name="claimid",strategy="com.vims.generators.ClaimIdGenerator")
 public class TheftClaim {
@@ -21,7 +23,9 @@ public class TheftClaim {
 	@GeneratedValue(generator="claimid")
 	private String claim_id;
 	private String total_amount;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date theft_date;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date complaint_date;
 	private String fir_number;
 	private String claim_amount;

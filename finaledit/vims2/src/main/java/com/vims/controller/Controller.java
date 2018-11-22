@@ -85,6 +85,18 @@ public class Controller {
 		String user=customer.getUsername();
 		String pass=customer.getPassword();
 		String cid=custService.findByCustomer(user, pass);
+		Date d=new Date();
+		Calendar cal=Calendar.getInstance();
+		//cal.setTime(d);
+		Date bd=customer.getDate_of_birth();
+		//System.out.println(bd);
+		cal.setTime(bd);
+		//System.out.println(cal.getTime());
+		cal.add(Calendar.YEAR, 90);
+		//System.out.println(cal.getTime());
+		if(d.after(cal.getTime())) {
+			return new ResponseEntity<String>("You are not eligible for registration as age is above 90 years", HttpStatus.OK);
+		}
 		if(cid!=null) {
 			return new ResponseEntity<String>("Customer already exists enter different username and password", HttpStatus.OK);
 		}
@@ -94,7 +106,7 @@ public class Controller {
 			return new ResponseEntity<String>("Customer not saved", HttpStatus.OK);
 
 		}
-		return new ResponseEntity<String>(customer.getCustomer_id()+" is saved successfully", HttpStatus.OK);
+		return new ResponseEntity<String>("Customer Registered Successfully with Customer Id : "+customer.getCustomer_id()+".", HttpStatus.OK);
 	}
 	
 	
@@ -118,7 +130,7 @@ public class Controller {
 		
 		if(!customer.isPresent()) {
 			//System.out.println("---- null");
-			return new ResponseEntity<String>("customer Id  "+c.getCustomer_id()+"  not found",HttpStatus.OK);
+			return new ResponseEntity<String>("Customer Id : "+c.getCustomer_id()+"  not found",HttpStatus.OK);
 		}
 		
 		return new ResponseEntity<Optional<Customer>> (customer,HttpStatus.OK);
@@ -177,9 +189,10 @@ public class Controller {
 	
 	@PostMapping(value = "/vehicle/save")
 	public ResponseEntity<?> saveVehicle(@RequestBody VehicleRegistration vehicle) {
-		System.out.println("vehicle savvee");
+		//System.out.println("vehicle savvee");
 		Calendar cal=Calendar.getInstance();cal.setTime(vehicle.getDate_of_purchase());
 		cal.add(Calendar.YEAR, 1);
+		
 		vehicle.setMaturity_date(cal.getTime());
 		if(vehicle.getVehicle_type().equalsIgnoreCase("TW")){
 			 PolicyIdGenerator.key="TW";
@@ -189,10 +202,10 @@ public class Controller {
 			}
 		
 		if(vehicle.getVehicle_class().equalsIgnoreCase("own")){
-	        vehicle.setPremium_amount(Double.toString((Double.parseDouble(vehicle.getPrice())*(0.065))/12));
+	        vehicle.setPremium_amount(Double.toString(Math.round((Double.parseDouble(vehicle.getPrice())*(0.065))/12)));
 	        
 	        }else{
-	        	 vehicle.setPremium_amount(Double.toString((Double.parseDouble(vehicle.getPrice())*(0.065)+(Double.parseDouble(vehicle.getPrice()))/12)));
+	        	 vehicle.setPremium_amount(Double.toString(Math.round((Double.parseDouble(vehicle.getPrice())*(0.065)+(Double.parseDouble(vehicle.getPrice())*0.034))/12)));
 	        	 
 	        }
 		Date d=new Date();
@@ -200,15 +213,19 @@ public class Controller {
 		cal1.setTime(d);
 		cal1.add(Calendar.YEAR, 1);
 		vehicle.setMaturity_date(cal1.getTime());
+		cal.setTime(new Date());
+		if(cal.getTime().before(vehicle.getDate_of_purchase())) {
+			return new ResponseEntity<String>("Not eligible for registration as date of purchase is more than current date", HttpStatus.OK);
+		}
 		vehicle=vehicleService.save(vehicle);
 		if(vehicle==null) {
-			System.out.println("returned");
+			//System.out.println("returned");
 			return new ResponseEntity<String>("vehicle not saved", HttpStatus.OK);
 		
 
 		}
-		System.out.println("returned");
-		return new ResponseEntity<String>("vehicle with policy id: "+vehicle.getPolicy_id()+" is saved with customer id: "+vehicle.getCustomer_id()+" premium amount is: "+vehicle.getPremium_amount()+" Maturity date is: "+vehicle.getMaturity_date(), HttpStatus.OK);
+		//System.out.println("returned");
+		return new ResponseEntity<String>("Vehicle Registered Successfully with Policy id: "+vehicle.getPolicy_id()+" and Customer id: "+vehicle.getCustomer_id()+". Premium amount is: Rs."+vehicle.getPremium_amount()+". Maturity date is: "+vehicle.getMaturity_date(), HttpStatus.OK);
 	}
 	
 	
@@ -239,8 +256,7 @@ public class Controller {
 	@PostMapping("/vehicle/findusingpolicyid")
 	public ResponseEntity<?> findVehicleById(@RequestBody VehicleRegistration vehicle) throws Exception {
 		
-		if(vehicle.getCustomer_id().equals("P001"))
-		throw new Exception();
+		
 		
 		vehicle=vehicleService.findById(vehicle.getPolicy_id()).get();
 		
@@ -282,7 +298,7 @@ public class Controller {
 	public ResponseEntity<?> saveDirectPay(@RequestBody DirectPay pay) {
 		VehicleRegistration v=vehicleService.findById(pay.getPolicy_id()).get();
 		//pay.setVehicle(v);
-		System.out.println("line1");
+		//System.out.println("line1");
 		List<DirectPay> l1=vehicleService.getDirectPayDetails(pay.getPolicy_id());
 		List<RegisteredPay>l2=vehicleService.getRegisteredPayDetails(pay.getPolicy_id());
 		Date max=new Date();
@@ -291,7 +307,7 @@ public class Controller {
 		c.set(2000, 01, 01);
 		max=c.getTime();
 		Date d=new Date();
-		System.out.println("line2");
+		//System.out.println("line2");
 		if(l1.size()==0&&l2.size()==0){
 			
 			pay.setPayment_date(d);
@@ -328,7 +344,7 @@ public class Controller {
 				}
 		}
 		}
-		System.out.println("line3");
+		//System.out.println("line3");
 		pay.setPayment_date(d);
 		Calendar cal=Calendar.getInstance();
 		cal.setTime(max);
@@ -340,12 +356,12 @@ public class Controller {
 		cal.add(Calendar.MONTH, 1);
 		pay.setDue_date(cal.getTime());
 		String pa=v.getPremium_amount();
-		double fap=0;System.out.println("line4");
+		double fap=0;//System.out.println("line4");
 		 if(pay.getPay_mode().equalsIgnoreCase("credit card")){
-		        fap=Double.parseDouble(pa)*0.023+Double.parseDouble(pa);
+		        fap=Math.round((Double.parseDouble(pa)*0.023+Double.parseDouble(pa)));
 		        }
 		        else{
-		        	 fap=Double.parseDouble(pa);
+		        	 fap=Math.round(Double.parseDouble(pa));
 		        }
 		       // double fap1=String.valueOf(fap);
 		 
@@ -357,7 +373,7 @@ public class Controller {
 			return new ResponseEntity<String>("directpay not saved", HttpStatus.OK);
 
 		}
-		return new ResponseEntity<String>("payment processed successfully and payment id is: "+pay.getPayment_id()+" next payment date is: "+pay.getDue_date()+" max date is"+max, HttpStatus.OK);
+		return new ResponseEntity<String>("Payment processed successfully, payment id is: "+pay.getPayment_id()+", paid amount is: Rs."+pay.getAmount_paid()+" and next payment date is: "+pay.getDue_date(), HttpStatus.OK);
 	}
 	
 	
@@ -435,7 +451,7 @@ public class Controller {
 		c.setTime(max);
 		c.set(2000, 01, 01);
 		max=c.getTime();
-		System.out.println("line1");
+		//System.out.println("line1");
 		Date d=new Date();
 		if(l1.size()==0&&l2.size()==0){
 			pay.setPaid_date(d);
@@ -473,7 +489,7 @@ public class Controller {
 				}
 		}
 		}
-		System.out.println("line2");
+		//System.out.println("line2");
 		Calendar cal1=Calendar.getInstance();
 		pay.setDue_date(max);
 		cal1.setTime(max);
@@ -489,31 +505,37 @@ public class Controller {
     	 Date d1=max;
     	 
     		        Date d2=pay.getPaid_date();
-    		        System.out.println("line5");
+    		        //System.out.println("line5");
     		        Calendar cal=Calendar.getInstance();
     		        cal.setTime(d1); 
-    		        System.out.println("line6");
+    		        //System.out.println("line6");
     		        double g1=cal.getTimeInMillis();
     		        
     		        cal.setTime(d2);
-    		        System.out.println("line7");
+    		        //System.out.println("line7");
     		        double g2=cal.getTimeInMillis();
-    		        System.out.println("line3");
+    		        //System.out.println("line3");
     		        double diff=(g2-g1)/(60*60*24*1000);
     		        int months=(int) (diff/28);
     		        
-    		        System.out.println("line4");
+    		        //System.out.println("line4");
+    		        //System.out.println(pa);
+    		       // System.out.println(pay.getPayment_mode());
     		        if(pay.getPayment_mode().equalsIgnoreCase("credit card")){
     		        	
-    		      fap=Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056)+((Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056))*0.023;
+    		        	//System.out.println("cerdit");
+    	
+    		      fap=Math.round(Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056)+((Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056))*0.023);
     		       
     		        
     		        }
     		        
     		        else{
-    		        	
-    		        	 fap=Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056);
+    		        	//System.out.println("othr");
+    		        	 fap=Math.round(Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056));
+    		      // System.out.println("afte other");
     		        }
+    		        
     		        String fap1=String.valueOf(fap);
     		        
     	 pay.setPay_amount(fap1);
@@ -525,7 +547,7 @@ public class Controller {
 			return new ResponseEntity<String>("registeredpay not saved", HttpStatus.OK);
 
 		}
-		return new ResponseEntity<String>("payment processed successfully with payment id: "+pay.getPayment_id()+" and next payment date is: "+pay.getDue_date()+" total amount paid is: "+fap1, HttpStatus.OK);
+		return new ResponseEntity<String>("Payment processed successfully with payment id: "+pay.getPayment_id()+" and next payment date is: "+pay.getDue_date()+" total amount paid is: Rs."+fap1, HttpStatus.OK);
 	}
 	
 	@PostMapping(value = "/registeredpay/lastpaid")
@@ -533,7 +555,7 @@ public class Controller {
 		
 		List<DirectPay> l1=vehicleService.getDirectPayDetails(pay1.getPolicy_id());
 		List<RegisteredPay>l2=vehicleService.getRegisteredPayDetails(pay1.getPolicy_id());
-		Date max=new Date();System.out.println("line1");
+		Date max=new Date();//System.out.println("line1");
 		Calendar c=Calendar.getInstance();
 		c.setTime(max);
 		c.set(2000, 01, 01);
@@ -542,8 +564,8 @@ public class Controller {
 		RegisteredPay pay=new RegisteredPay();
 		Date d=new Date();
 		pay.setPaid_date(d);
-		System.out.println("line2");
-				if(l1.size()==0){
+		//System.out.println("line2");
+				if(l1.size()==0&&l2.size()!=0){
 					max=l2.get(0).getDue_date();
 					for(RegisteredPay l:l2) {
 						if(l.getDue_date().after(max)) {
@@ -552,14 +574,14 @@ public class Controller {
 						}
 				}
 				}
-				else if(l2.size()==0){
+				else if(l2.size()==0&l1.size()!=0){
 					max=l1.get(0).getDue_date();
 					for(DirectPay l:l1) {
 						if(l.getDue_date().after(max)) {
 							max=l.getDue_date();
 						}
 					}
-				}else{
+				}else if(l1.size()!=0&&l2.size()!=0){
 					for(DirectPay l:l1) {
 						if(l.getDue_date().after(max)) {
 							max=l.getDue_date();
@@ -573,8 +595,8 @@ public class Controller {
 						}
 				}
 		}
-		System.out.println("line3");
-				VehicleRegistration v=vehicleService.findById(pay1.getPolicy_id()).get();
+		//System.out.println("line3");
+		VehicleRegistration v=vehicleService.findById(pay1.getPolicy_id()).get();
 				
 		
 		pay.setDue_date(max);
@@ -582,7 +604,7 @@ public class Controller {
 			return new ResponseEntity<String>("Your due date is not yet over. Please proceed to Direct Pay ", HttpStatus.OK);
 		}
 		
-		System.out.println("line4");
+		//System.out.println("line4");
 		
 		String pa=v.getPremium_amount();
 		 double fap=0;
@@ -594,18 +616,18 @@ public class Controller {
     		        long diff=(g2-g1)/(60*60*24*1000); 
     		        int months=(int) (diff/28);
     		        
-    		        fap=Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056);
+    		        fap=Math.round(Double.parseDouble(pa)+(Double.parseDouble(pa)*months)+Double.parseDouble(pa)*diff*(0.0056));
     		        
     		        String fap1=String.valueOf(fap);
     	 pay.setPay_amount(fap1);
-		System.out.println("line5");
+		//System.out.println("line5");
 		if(pay==null) {
-			System.out.println("line6");
+			//System.out.println("line6");
 			return new ResponseEntity<String>("registered pay does not exist", HttpStatus.OK);
 
 		}
-		System.out.println("line7");
-		return new ResponseEntity<String>("Your due date is over on : "+pay.getDue_date()+" and amount to be paid with fine is :"+pay.getPay_amount(), HttpStatus.OK);
+		//System.out.println("line7");
+		return new ResponseEntity<String>("Your due date is over on : "+pay.getDue_date()+" and amount to be paid with fine is : Rs."+pay.getPay_amount(), HttpStatus.OK);
 	}
 	
 	
@@ -696,7 +718,7 @@ public class Controller {
         	accidentclaim.setWeightage("20");
         }
 		}
-		if(v.getVehicle_type()=="FW") {
+		if(v.getVehicle_type().equals("FW")) {
 			 if(type.equalsIgnoreCase("fire")){
 		        	accidentclaim.setWeightage("70");
 		        }else if(type.equalsIgnoreCase("road accident")){
@@ -725,6 +747,8 @@ public class Controller {
         Calendar cal=Calendar.getInstance();
         cal.setTime(purchase_date);
         System.out.println("line3");
+        System.out.println(vehicleprice);
+        claimamount=Math.round(Double.parseDouble(accidentclaim.getTotal_amount())*Double.parseDouble(accidentclaim.getWeightage())/100);
         cal.add(Calendar.YEAR, 5);double maxamount=0;
         if(cal.before(d)){
         	maxamount=vehicleprice/2;
@@ -739,7 +763,7 @@ public class Controller {
         }System.out.println("line4");System.out.println(accidentclaim.getTotal_amount());
 		 System.out.println(accidentclaim.getWeightage());
 		 System.out.println(v.getVehicle_type());
-		 claimamount=Double.parseDouble(accidentclaim.getTotal_amount())*Double.parseDouble(accidentclaim.getWeightage())/100;
+		 claimamount=Math.round(Double.parseDouble(accidentclaim.getTotal_amount())*Double.parseDouble(accidentclaim.getWeightage())/100);
 		 //
 		 
 		if(claimamount<5000&&v.getVehicle_type()=="TW") {
@@ -751,6 +775,7 @@ public class Controller {
 		accidentclaim.setClaim_amount(Double.toString(claimamount));
 		accidentclaim.setStatus("Processing");
 		System.out.println("line5");
+		System.out.println(accidentclaim.getClaim_amount());
 		accidentclaim=accidentclaimservice.save(accidentclaim);
 		
 		if(accidentclaim==null) {
@@ -802,7 +827,7 @@ public class Controller {
 				}
 		}
 }
-		return new ResponseEntity<String>("total amount paid is :"+directamount+"with policy id: "+accidentclaim.getPolicy_id(), HttpStatus.OK);
+		return new ResponseEntity<String>("total amount paid is : Rs."+directamount+" with policy id: "+accidentclaim.getPolicy_id(), HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/accidentclaim/findall")
@@ -882,10 +907,10 @@ public class Controller {
 	
 	@PostMapping(value = "/theftclaim/save")
 	public ResponseEntity<?> saveTheftClaim(@RequestBody TheftClaim theftclaim) {
-		Customer c=custService.findById(theftclaim.getCustomer_id()).get();
+		//Customer c=custService.findById(theftclaim.getCustomer_id()).get();
 		VehicleRegistration v=vehicleService.findById(theftclaim.getPolicy_id()).get();
 		
-		double claimamount=((Double.parseDouble(theftclaim.getTotal_amount())*0.75));
+		double claimamount=Math.round((Double.parseDouble(theftclaim.getTotal_amount())*0.75));
 		Date d1=theftclaim.getTheft_date();
         Date d2=theftclaim.getComplaint_date();
         Calendar cal=Calendar.getInstance();
@@ -1098,7 +1123,7 @@ public class Controller {
 	       can.setCancel_date(s2);
 	       
 	       can.setLast_paid_date(lastpaiddate);
-	       can.setTotal_amount(Double.toString(directamount));
+	       can.setTotal_amount(Double.toString(Math.round(directamount)));
 	       if(l1.size()==0){
 				min=l2.get(0).getDue_date();
 				for(RegisteredPay l:l2) {
@@ -1163,7 +1188,7 @@ public class Controller {
 	    	   else if(n==9){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1235);
+	    		   double t=Math.round(l-(l*0.1235));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    		   
@@ -1171,7 +1196,7 @@ public class Controller {
 	    	   else if(n>=7){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1025);
+	    		   double t=Math.round(l-(l*0.1025));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    		   
@@ -1180,7 +1205,7 @@ public class Controller {
 	    	      else if(n>=5){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.07);
+	    		   double t=Math.round(l-(l*0.07));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    	   }
@@ -1190,7 +1215,7 @@ public class Controller {
 	    	   if(m>3){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1235);
+	    		   double t=Math.round(l-(l*0.1235));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    	   }
@@ -1293,7 +1318,7 @@ public class Controller {
 	       can.setCancel_date(s2);
 	       
 	       can.setLast_paid_date(lastpaiddate);
-	       can.setTotal_amount(Double.toString(directamount));
+	       can.setTotal_amount(Double.toString(Math.round(directamount)));
 	       if(l1.size()==0){
 				min=l2.get(0).getDue_date();
 				for(RegisteredPay l:l2) {
@@ -1358,7 +1383,7 @@ public class Controller {
 	    	   else if(n==9){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1235);
+	    		   double t=Math.round(l-(l*0.1235));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    		   
@@ -1366,7 +1391,7 @@ public class Controller {
 	    	   else if(n>=7){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1025);
+	    		   double t=Math.round(l-(l*0.1025));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    		   
@@ -1375,7 +1400,7 @@ public class Controller {
 	    	      else if(n>=5){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.07);
+	    		   double t=Math.round(l-(l*0.07));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    	   }
@@ -1385,7 +1410,7 @@ public class Controller {
 	    	   if(m>3){
 	    		   String s=can.getTotal_amount();
 	    		   double l= Double.parseDouble(s);
-	    		   double t=l-(l*0.1235);
+	    		   double t=Math.round(l-(l*0.1235));
 	    		   String to=String.valueOf(t);
 	    		   can.setWithdraw_amount(to);
 	    	   }
@@ -1408,11 +1433,12 @@ public class Controller {
 		return new ResponseEntity<String>("total amount that can be withdrawn is : "+can.getWithdraw_amount()+" last paid date is: "+lastpaiddate, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/cancel/findallduevehicles/")
+	@GetMapping(value = "/cancel/findallduevehicles")
 	public ResponseEntity<?> listAllDueVehicles() {
 		Date d=new Date();List<VehicleRegistration>vehicles=vehicleService.findAll();
 		
 		List<VehicleRegistration>duevehicles=new ArrayList<>();
+		
 		System.out.println("line1");
 		System.out.println(vehicles);
 		for(VehicleRegistration v:vehicles){
@@ -1459,7 +1485,7 @@ public class Controller {
 						Calendar cal=Calendar.getInstance();
 						cal.setTime(max);
 						cal.add(Calendar.MONTH, 3);
-						if(cal.before(d)){
+						if(cal.getTime().before(d)){
 							
 							duevehicles.add(v);
 						}
@@ -1475,7 +1501,7 @@ public class Controller {
 		
 	}
 	
-	@GetMapping(value = "/cancel/findall/")
+	@GetMapping(value = "/cancel/findall")
 	public ResponseEntity<?> listAllCancellation() {
 		cancels = cancelservice.findAll();
 		if (cancels.isEmpty()) {
@@ -1534,18 +1560,205 @@ public class Controller {
 		return  new ResponseEntity<String>("cancel Id with "+can.getCancel_id()+" Deleteted", HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/cancel/approve/{cancel_id}")
-	public ResponseEntity<?> approvecancellation(@PathVariable String cancel_id) {
-		Cancellation tc=cancelservice.findById(cancel_id).get();
-		tc.setStatus("approved");
-		tc=cancelservice.save(tc);
-		if(tc==null) {
-			return new ResponseEntity<String>("cancellation not found", HttpStatus.OK);
+	@GetMapping(value = "/cancel/approve/{policy_id}")
+	public ResponseEntity<?> approvecancellation(@PathVariable String policy_id) {
+		Cancellation can=new Cancellation();
+		can.setPolicy_id(policy_id);
+		//Cancellation tc=cancelservice.findById(policy_id).get();
+		VehicleRegistration v=vehicleService.findById(policy_id).get();
+		//Cancellation can=new Cancellation();
+		
+		//can.setRegistered_date(v.getDate_of_purchase());
+		//can.setTotal_amount(Double.toString(directPayService.findTotalAmountByCustomerId(custId)));
 
+	    Date s2=new Date();
+	    Date s1=null;
+	    
+	    List<DirectPay> l1=vehicleService.getDirectPayDetails(policy_id);
+		List<RegisteredPay>l2=vehicleService.getRegisteredPayDetails(policy_id);
+		Date max=new Date();
+		Calendar c1=Calendar.getInstance();
+		c1.setTime(max);
+		c1.set(2000, 01, 01);
+		max=c1.getTime();
+		Date lastpaiddate=c1.getTime();
+		//System.out.println("line1");
+		double directamount=0;
+				if(l1.size()==0){
+					max=l2.get(0).getDue_date();
+					for(RegisteredPay l:l2) {directamount+=Double.parseDouble(l.getPay_amount());
+						if(l.getDue_date().after(max)) {
+							max=l.getDue_date();
+						}
+						if(lastpaiddate.before(l.getPaid_date())){
+							lastpaiddate=l.getPaid_date();
+						}
+				}
+				}
+				else if(l2.size()==0){
+					max=l1.get(0).getDue_date();
+					for(DirectPay l:l1) {directamount+=(l.getAmount_paid());
+						if(l.getDue_date().after(max)) {
+							max=l.getDue_date();
+						}
+						if(lastpaiddate.before(l.getPayment_date())){
+							lastpaiddate=l.getPayment_date();
+						}
+					}
+				}else{
+					for(DirectPay l:l1) {directamount+=(l.getAmount_paid());
+						if(l.getDue_date().after(max)) {
+							max=l.getDue_date();
+						}
+						if(lastpaiddate.before(l.getPayment_date())){
+							lastpaiddate=l.getPayment_date();
+						}
+					}
+					
+					for(RegisteredPay l:l2) {directamount+=Double.parseDouble(l.getPay_amount());
+						if(l.getDue_date().after(max)) {
+							max=l.getDue_date();
+						}
+						if(lastpaiddate.before(l.getPaid_date())){
+							lastpaiddate=l.getPaid_date();
+						}
+				}
 		}
+
+//
+				
+				//System.out.println("line2");
+	       s1=max;
+	       can.setLast_paid_date(lastpaiddate);
+	       Date s3=null;Date min=new Date();
+	       can.setCancel_date(s2);
+	       
+	       can.setLast_paid_date(lastpaiddate);
+	       can.setTotal_amount(Double.toString(Math.round(directamount)));
+	       if(l1.size()==0){
+				min=l2.get(0).getDue_date();
+				for(RegisteredPay l:l2) {
+					if(l.getPaid_date().before(min)) {
+						min=l.getPaid_date();
+					}
+			}
+			}
+			else if(l2.size()==0){
+				min=l1.get(0).getDue_date();
+				for(DirectPay l:l1) {
+					if(l.getPayment_date().before(min)) {
+						min=l.getPayment_date();
+					}
+				}
+			}else{
+				for(DirectPay l:l1) {
+					if(l.getPayment_date().before(min)) {
+						min=l.getPayment_date();
+					}
+				}
+				
+				for(RegisteredPay l:l2) {
+					if(l.getPaid_date().before(min)) {
+						min=l.getPaid_date();
+					}
+			}
+	}
+	      // System.out.println("line3");
+	       s3=min;
+	       can.setLast_paid_date(lastpaiddate);
+	       can.setRegistered_date(s3);
+	       Calendar cal=Calendar.getInstance();
+	       cal.setTime(s1);
+	       
+	       int months1=cal.get(Calendar.MONTH);
+	       int year1=cal.get(Calendar.YEAR);
+	       cal.setTime(s2);
+	       int months2=cal.get(Calendar.MONTH);
+	       int year2=cal.get(Calendar.YEAR);
+	       int n=((year2-year1)*12)+(months2-months1);
+	       
+	       Date s4=can.getCancel_date();
+	        
+	       Calendar cal1=Calendar.getInstance();
+	       cal1.setTime(s3);
+	       int mont1=cal1.get(Calendar.MONTH);
+	       int yea1=cal1.get(Calendar.YEAR);
+	       cal1.setTime(s4);
+	       int mont2=cal1.get(Calendar.MONTH);
+	       int yea2=cal1.get(Calendar.YEAR);
+	       int m=((yea2-yea1)*12)+(mont2-mont1);
+	       //System.out.println("line4");
+	       if(n>3){
+	    	   if(n>9){
+	    		   String s=can.getTotal_amount();
+	    		   double l= Double.parseDouble(s);
+	    		   double t=0;
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    	   }
+	    	   else if(n==9){
+	    		   String s=can.getTotal_amount();
+	    		   double l= Double.parseDouble(s);
+	    		   double t=Math.round(l-(l*0.1235));
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    		   
+	    	   }
+	    	   else if(n>=7){
+	    		   String s=can.getTotal_amount();
+	    		   double l= Double.parseDouble(s);
+	    		   double t=Math.round(l-(l*0.1025));
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    		   
+	    	   }
+	    	   
+	    	      else if(n>=5){
+	    		   String s=can.getTotal_amount();
+	    		   double l= Double.parseDouble(s);
+	    		   double t=Math.round(l-(l*0.07));
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    	   }
+	    	   
+	       }
+	       else{
+	    	   if(m>3){
+	    		   String s=can.getTotal_amount();
+	    		   double l= Double.parseDouble(s);
+	    		   double t=Math.round(l-(l*0.1235));
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    	   }
+	    	   else{
+	    		   double t=0;
+	    		   String to=String.valueOf(t);
+	    		   can.setWithdraw_amount(to);
+	    		   return new ResponseEntity<String>("not eligible for cancellation as 3 months is not completed", HttpStatus.OK);
+	    	   }
+	       }
+	       can.setCustomer_id(v.getCustomer_id());
+	       can.setPolicy_id(v.getPolicy_id());
+	       can.setStatus("approved");
+	       
+	       List<Cancellation> cancellist=vehicleService.getCancellationDetails(policy_id);
+	       if(cancellist.size()!=0){
+	    	   return new ResponseEntity<String>("You have already cancelled this policy ", HttpStatus.OK);
+	       }
+	       //System.out.println("line5");
+	       can=cancelservice.save(can);
+	       
+		if(can==null) {
+			return new ResponseEntity<String>("cancel not saved", HttpStatus.OK);
+
+	}
+		//Customer c=custService.findById(can.getCustomer_id()).get();
+		
+		//saveCancellation(can);
+		
 		//custService.deleteById(can.getCustomer_id());
 	
-		vehicleService.deleteById(tc.getPolicy_id());
+		vehicleService.deleteById(can.getPolicy_id());
 		return new ResponseEntity<String>("Approved successfully", HttpStatus.OK);
 	}
 	

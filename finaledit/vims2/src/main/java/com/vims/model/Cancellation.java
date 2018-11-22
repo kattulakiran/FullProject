@@ -12,6 +12,8 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity(name="cancellation_details")
 @GenericGenerator(name="cancelid",strategy="com.vims.generators.CancelIdGenerator")
 public class Cancellation {
@@ -22,8 +24,11 @@ public class Cancellation {
 	private String cancel_id;
 	private String total_amount;
 	private String withdraw_amount;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date last_paid_date;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date cancel_date;
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date registered_date;
 	private String status;
 
